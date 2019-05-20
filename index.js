@@ -20,6 +20,78 @@ const guessSeats = args => {
   }
 }
 
+const addParties = (votes, partiesList = ['lightblue', 'red', 'yellow', 'blue', 'green', 'grey', 'gold', 'darkgreen']) => {
+  const votesList = {}
+  votes.forEach ((vote,idx) => votesList[partiesList[idx]]=1*vote);
+  return votesList
+}
+
+
+const SeatObject = function () {
+  return {
+    party: undefined,
+    // seatNumber: undefined,
+    votes: undefined,
+    // cost: undefined,
+    // etc: undefined
+  }
+}
+
+const populateSeatData = (seat, thisSeatGoesTo, movingTally, seatNumber ) => {
+  seat.party = thisSeatGoesTo;
+  seat.votes = movingTally[thisSeatGoesTo];
+  seat.seatNumber = seatNumber;
+}
+
+const keyOfObjectMax = obj =>
+  Object.keys(obj).reduce((a, b) => obj[a] > obj[b] ? a : b);
+
+const trimEmptiesFromObject = (obj) => {
+  const trimZeroes = true;
+  Object.keys(obj).forEach (key => {
+    if ((!trimZeroes && obj[key]===0)
+      || !obj[key]
+      || obj[key] == {}
+      || !obj[key].length
+    )
+      delete obj[key];
+    });
+};
+
+const calculateResults = (seats, votes) => {
+  const votesList = addParties(votes);
+  const movingTally = Object.assign ({},votesList);
+  const resultsBySeat = new Array(seats).fill().map(()=>new SeatObject());
+  const resultsByParty = {};
+  // Object.keys(votesList).forEach (key => {
+  //   resultsByParty[key] = [];
+  // });
+
+  console.log(votesList);
+
+  resultsBySeat.forEach ((seat, idx) => {
+    const thisSeatGoesTo = keyOfObjectMax(movingTally);
+    populateSeatData (seat, thisSeatGoesTo, movingTally, idx+1 );
+    if (!resultsByParty[thisSeatGoesTo])
+      resultsByParty[thisSeatGoesTo] = [];
+    resultsByParty[thisSeatGoesTo].push (seat);
+
+    console.log(resultsBySeat, 'should update with:', seat);
+
+    // this line is for the weird arbitrary way the D'Hondt system allocates a party multiple seats.
+    movingTally[thisSeatGoesTo] = votesList[thisSeatGoesTo]/(resultsByParty[thisSeatGoesTo].length+1) ;
+    console.log('movingTally',movingTally);
+  });
+
+  const loserSuxx = {};
+  populateSeatData (loserSuxx, keyOfObjectMax(movingTally), movingTally);
+
+  trimEmptiesFromObject (resultsByParty);
+
+  return {resultsBySeat, resultsByParty, neededForNextSeat : movingTally, loserSuxx }
+}
+
+
 if (require.main === module) {
   const args = process.argv.slice (2);
   var seats = guessSeats(args) || args.splice(0,1)[0];
@@ -27,10 +99,12 @@ if (require.main === module) {
   if (region[seats])
     console.log('region: ',seats);
   (seats = region[seats] || seats);
-  console.log('seats be:',seats);
-  console.log('votes be:',args.join(', '));
+  console.log('seats:',seats);
+  console.log('votes:',args.join(', '));
 
-}
-
-const doStuff = params => {
+  const results=calculateResults (seats, args)
+  console.log(results);
+  console.log(results.resultsByParty);
+  if (results.resultsByParty[results.loserSuxx.party].length<2)
+    console.log(`..and ${results.loserSuxx.party} is screwing -  ${results.loserSuxx.votes} did not cut it.`);
 }
