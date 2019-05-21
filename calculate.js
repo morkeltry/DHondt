@@ -22,7 +22,7 @@ const guessSeats = args => {
 }
 
 const addParties = (votes, partiesList = ['lightblue', 'red', 'yellow', 'blue', 'green', 'grey', 'gold', 'darkgreen']) => {
-  const votesList = {}
+  const votesList = {};
   votes.forEach ((vote,idx) => votesList[partiesList[idx]]=1*vote);
   return votesList
 }
@@ -50,7 +50,7 @@ const keyOfObjectMax = obj =>
 const trimEmptiesFromObject = (obj) => {
   const trimZeroes = true;
   Object.keys(obj).forEach (key => {
-    if ((!trimZeroes && obj[key]===0)
+    if ((trimZeroes && (obj[key]===0 || obj[key]==='0'))
       || !obj[key]
       || obj[key] == {}
       || !obj[key].length
@@ -109,4 +109,4 @@ if (require.main === module) {
     console.log(`..and ${results.loserSuxx.party} is screwing -  ${results.loserSuxx.votes} did not cut it.`);
 }
 
-module.exports = { calculateResults, region }
+module.exports = { calculateResults, region, trimEmptiesFromObject }
