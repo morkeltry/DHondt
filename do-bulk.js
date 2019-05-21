@@ -3,7 +3,7 @@ const fs = require('fs');
 if (typeof fetch !== 'function') {
     global.fetch = require('node-fetch-polyfill');
 }
-const { calculateResults, region, trimEmptiesFromObject } = require ('./calculate.js');
+const { calculateResults, seatsNumber, trimEmptiesFromObject } = require ('./calculate.js');
 const colour = {
   'Con' : 'blue',
   'Lab' : 'red',
@@ -14,7 +14,7 @@ const colour = {
   'UKIP' : 'purple',
   'Brexit Party' : 'lightblue',
   'Change UK' : 'grey',
-  'Other' : ''
+  'Other' : 'pink'
 };
 
 const transpose = (data => {
@@ -39,14 +39,12 @@ fs.readFile (inputFile, 'utf8', (err, data) => {
   console.log(data);
 
   Object.keys(data).forEach (region => {
-    console.log(data[region]);
-    console.log(`And that is a ${typeof data[region]}. Is it an array? ${Array.isArray(data[region])}`);
     trimEmptiesFromObject(data[region]);
+    console.log(Object.values(data[region]));
+    const result = calculateResults (seatsNumber[region], Object.values(data[region]))
     console.log(data[region]);
+    console.log(result);
   });
-  console.log(data);
-
-
 
 
   // trimEmptiesFromObject();

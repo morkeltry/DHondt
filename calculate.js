@@ -1,6 +1,6 @@
 
 const defaultSeats = 'L';
-const region = {L: 8, SE: 10, SW: 6, W: 4, WM: 7, EM: 5, E: 7, Y: 6, YH: 6, NW: 8, NE: 3, S: 6, X: 8};
+const seatsNumber = {L: 8, SE: 10, SW: 6, W: 4, WM: 7, EM: 5, E: 7, Y: 6, YH: 6, NW: 8, NE: 3, S: 6, X: 8};
 
 const guessSeats = args => {
   var seats = args[0];
@@ -21,7 +21,7 @@ const guessSeats = args => {
   }
 }
 
-const addParties = (votes, partiesList = ['lightblue', 'red', 'yellow', 'blue', 'green', 'grey', 'gold', 'darkgreen']) => {
+const addParties = (votes, partiesList = ['blue', 'red', 'yellow', 'gold', 'darkgreen',  'green', 'purple', 'lightblue', 'grey', 'pink']) => {
   const votesList = {};
   votes.forEach ((vote,idx) => votesList[partiesList[idx]]=1*vote);
   return votesList
@@ -77,11 +77,11 @@ const calculateResults = (seats, votes) => {
       resultsByParty[thisSeatGoesTo] = [];
     resultsByParty[thisSeatGoesTo].push (seat);
 
-    console.log(resultsBySeat, 'should update with:', seat);
+    // console.log(resultsBySeat, 'should update with:', seat);
 
     // this line is for the weird arbitrary way the D'Hondt system allocates a party multiple seats.
     movingTally[thisSeatGoesTo] = votesList[thisSeatGoesTo]/(resultsByParty[thisSeatGoesTo].length+1) ;
-    console.log('movingTally',movingTally);
+    // console.log('movingTally',movingTally);
   });
 
   const loserSuxx = {};
@@ -96,9 +96,9 @@ const calculateResults = (seats, votes) => {
 if (require.main === module) {
   const args = process.argv.slice (2);
   var seats = guessSeats(args) || args.splice(0,1)[0];
-  if (region[seats])
-    console.log('region: ',seats);
-  (seats = region[seats] || seats);
+  if (seatsNumber[seats])
+    console.log('seatsNumber: ',seats);
+  (seats = seatsNumber[seats] || seats);
   console.log('seats:',seats);
   console.log('votes:',args.join(', '));
 
@@ -109,4 +109,4 @@ if (require.main === module) {
     console.log(`..and ${results.loserSuxx.party} is screwing -  ${results.loserSuxx.votes} did not cut it.`);
 }
 
-module.exports = { calculateResults, region, trimEmptiesFromObject }
+module.exports = { calculateResults, seatsNumber, trimEmptiesFromObject }
